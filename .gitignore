@@ -1,0 +1,6 @@
+cf.log
+cf.out
+edit.html
+*.tmp
+.DS_Store
+Thumbs.db
