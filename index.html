@@ -168,6 +168,32 @@ document.querySelectorAll('.block-controls, .toolbar').forEach(function(el) { el
 removeBlockControls(document.getElementById(CONTENT_ID));
 }
 }
+var ASSET_BASE = 'https://ychkydyk.github.io/dma-kp/';
+function absolutizeAssets(root) {
+var isAbs = function(u) { return /^(https?:|data:|file:|mailto:|tel:|#|\/\/)/i.test(u); };
+root.querySelectorAll('img').forEach(function(img) {
+var s = img.getAttribute('src');
+if (s && !isAbs(s)) img.setAttribute('src', ASSET_BASE + s.replace(/^\.?\
+var ss = img.getAttribute('srcset');
+if (ss) {
+img.setAttribute('srcset', ss.split(',').map(function(part) {
+var seg = part.trim().split(/\s+/);
+if (seg[0] && !isAbs(seg[0])) seg[0] = ASSET_BASE + seg[0].replace(/^\.?\
+return seg.join(' ');
+}).join(', '));
+}
+});
+root.querySelectorAll('a').forEach(function(a) {
+var h = a.getAttribute('href');
+if (h && !isAbs(h) && /\.(png|jpe?g|webp|gif|svg|pdf|zip|mp4|mov)$/i.test(h)) {
+a.setAttribute('href', ASSET_BASE + h.replace(/^\.?\
+}
+});
+root.querySelectorAll('source[src], video[src], audio[src]').forEach(function(el) {
+var s = el.getAttribute('src');
+if (s && !isAbs(s)) el.setAttribute('src', ASSET_BASE + s.replace(/^\.?\
+});
+}
 function exportClient() {
 var name = prompt('Имя клиента (попадёт в шапку и filename):');
 if (!name || !name.trim()) return;
@@ -179,6 +205,7 @@ docClone.querySelectorAll('.editable').forEach(function(el) {
 el.removeAttribute('contenteditable');
 el.classList.remove('editable');
 });
+absolutizeAssets(docClone);
 docClone.querySelectorAll('[data-client]').forEach(function(el) { el.innerText = safeName; });
 var cb = docClone.querySelector('body');
 if (cb) cb.classList.add('client-mode');
